@@ -1,5 +1,16 @@
 """String constants used in the UI"""
 
+TEAMS_SETTINGS = "Nastavovanie tímov"
+ADD_TEAM_BUTTON = "Pridať ďalší tím"
+ASSIGN_KEY = "Priraď tlačidlo"
+TEAM_PLACEHOLDER = "Tím "
+TEAM_CHAR_SHOW = "Tím používa znak >>> "
+NOT_EXIST_FREE_CHARACTER = "Neexistuje nepoužívaný znak"
+PRESS_KEY_MESSAGE = "Stlač klávesu so znakom, ktorý má mať tím"
+PRESS_KEY_INFO = "Treba ju stlačiť po zmiznutí tejto správy"
+CHAR_CHANGE_SUCCESS = "Znak sa podarilo uspesne zmenit"
+CHAR_CHANGE_ABORT = "Znak sa nepodarilo zmenit, kedze bud nebol podporovany alebo obsadeny"
+
 QUIZ_FRAME_TITLE = "Megakvíz 3000"
 NEXT_QUESTION_BUTTON = "Ďalšia otázka"
 CORRECT_ANSWER_BUTTON = "Odpovedať správne"

@@ -1,5 +1,8 @@
 import wx
 import strings
+import state
+import quizframe
+from functions import load
 
 
 class TeamsFrame(wx.Frame):
@@ -12,9 +15,29 @@ class TeamsFrame(wx.Frame):
         self.add_button = wx.Button(self.panel, label=strings.ADD_TEAM_BUTTON)
         self.add_button.Bind(wx.EVT_BUTTON, lambda x: self.addRow())
         self.add_button.Bind(wx.EVT_CHAR_HOOK, self.on_key_down)
+        self.confirm_button = wx.Button(self.panel, label=strings.CONFIRM_TEAMS_BUTTON, pos=(100, 0))
+        self.confirm_button.Bind(wx.EVT_BUTTON, self.start)
         self.rows_sizer.Add(self.add_button)
         self.addDefaultRows()
         self.SetFocus()
+
+    def start(self, event):
+        answer, warning = self.team_names_entered()
+        if answer:
+            self.Destroy()
+            s = state.StartingState(load(), self.getTeams())
+            frame = quizframe.QuizFrame(s)
+            frame.Show()
+        else:
+            wx.MessageBox(warning)
+
+    def team_names_entered(self):
+        names = [item[0].GetValue() for item in self.teams]
+        if '' in names:
+            return False, strings.EMPTY_TEAM_NAME_WARNING
+        if len(names) != len(set(names)):
+            return False, strings.TEAM_NAME_DUPLICITY_WARNING
+        return True, None
 
     def addDefaultRows(self):
         for i in range(3):
@@ -26,6 +49,7 @@ class TeamsFrame(wx.Frame):
         row = wx.BoxSizer(wx.HORIZONTAL)
         team_name_input = wx.TextCtrl(self.panel, size=(300, 25))
         team_name_input.SetValue(strings.TEAM_PLACEHOLDER + str(team_index))
+        team_name_input.SetHint(strings.EMPTY_NAME_PLACEHOLDER)
         team_name_input.SetModified(True)
         team_name_input.SetEditable(True)
         team_char_id = wx.StaticText(self.panel, label=strings.TEAM_CHAR_SHOW + team_char)

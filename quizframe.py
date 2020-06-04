@@ -48,7 +48,6 @@ class AnswerStatePanel(StatePanel):
 
         for team in self.state.teams_queue:
             self.teams_queue_labels.append(wx.StaticText(parent=self, label=team))
-
         self.buttons_sizer = wx.BoxSizer(orient=wx.HORIZONTAL)
         self.buttons_sizer.Add(self.wrong_button, flag=wx.ALIGN_CENTER)
         self.buttons_sizer.Add(self.correct_button, flag=wx.ALIGN_CENTER)
@@ -77,7 +76,6 @@ class AnswerStatePanel(StatePanel):
         widget.Bind(event_binder, handler)
         for child in widget.GetChildren():
             self.bind_all_descendands(event_binder, handler, child)
-
 
     def on_key_down(self, event):
         pressed_key = chr(event.GetKeyCode())

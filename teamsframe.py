@@ -3,6 +3,7 @@ import strings
 import state
 import quizframe
 from functions import load
+from questionsframe import QUESTIONS_FILENAME
 
 
 class TeamsFrame(wx.Frame):
@@ -37,7 +38,7 @@ class TeamsFrame(wx.Frame):
         answer, warning = self.team_names_entered()
         if answer:
             self.Destroy()
-            s = state.StartingState(load(), self.getTeams())
+            s = state.StartingState(load(QUESTIONS_FILENAME), self.getTeams())
             frame = quizframe.QuizFrame([s])
             frame.Show()
         else:

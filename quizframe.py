@@ -1,5 +1,9 @@
+import os
 import wx
 import strings
+from functions import save
+
+HISTORY_FILENAME = "history.pickle"
 
 class StatePanelMaker:
     def __init__(self, quiz_frame):
@@ -134,6 +138,9 @@ class QuizFrame(wx.Frame):
         self.sizer.Add(self.state_panel, flag=wx.ALIGN_CENTER)
         self.SetSizer(self.sizer)
 
+        self.Bind(wx.EVT_CLOSE, self.on_close)
+        self.save_history()
+
     def enter_state(self, state):
         self.state = state
         self.state_panel = self.state_panel_maker.visit(state)
@@ -150,9 +157,19 @@ class QuizFrame(wx.Frame):
 
     def set_state(self, state):
         self.history.append(state)
+        self.save_history()
         self.enter_state(state)
 
     def undo(self, event):
         if len(self.history) > 1:
             self.history.pop(-1)
+            self.save_history()
             self.enter_state(self.history[-1])
+
+    def save_history(self):
+        save(HISTORY_FILENAME, self.history)
+
+    def on_close(self, event):
+        if isinstance(self.state_panel, FinalStatePanel):
+            os.remove(HISTORY_FILENAME)
+        self.Destroy()

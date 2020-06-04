@@ -1,5 +1,9 @@
+import os
 import wx
 import strings
+from functions import save
+
+HISTORY_FILENAME = "history.pickle"
 
 class StatePanelMaker:
     def __init__(self, quiz_frame):
@@ -80,7 +84,8 @@ class AnswerStatePanel(StatePanel):
     def on_key_down(self, event):
         pressed_key = chr(event.GetKeyCode())
         new_state = self.state.queue_team(pressed_key)
-        self.quiz_frame.set_state(new_state)
+        if new_state is not self.state:
+            self.quiz_frame.set_state(new_state)
 
 class ReviewStatePanel(StatePanel):
     def __init__(self, state, quiz_frame):
@@ -119,21 +124,29 @@ class FinalStatePanel(StatePanel):
 
 
 class QuizFrame(wx.Frame):
-    def __init__(self, state):
+    def __init__(self, history):
         super(QuizFrame, self).__init__(parent=None, title=strings.QUIZ_FRAME_TITLE)
         self.state_panel_maker = StatePanelMaker(self)
-        self.state = state
-        self.state_panel = self.state_panel_maker.visit(state)
+        self.history = history
+        self.state = history[-1]
+        self.state_panel = self.state_panel_maker.visit(self.state)
+        self.undo_button = wx.Button(parent=self, label=strings.UNDO)
+        self.undo_button.Bind(wx.EVT_BUTTON, self.undo)
+
         self.sizer = wx.BoxSizer(orient=wx.VERTICAL)
+        self.sizer.Add(self.undo_button, flag=wx.ALIGN_LEFT)
         self.sizer.Add(self.state_panel, flag=wx.ALIGN_CENTER)
         self.SetSizer(self.sizer)
 
-    def set_state(self, state):
+        self.Bind(wx.EVT_CLOSE, self.on_close)
+        self.save_history()
+
+    def enter_state(self, state):
         self.state = state
         self.state_panel = self.state_panel_maker.visit(state)
-        self.sizer.Hide(0)
-        self.sizer.Remove(0)
-        self.sizer.Add(self.state_panel, flag=wx.ALIGN_CENTER)
+        self.sizer.Hide(1)
+        self.sizer.Remove(1)
+        self.sizer.Insert(1, self.state_panel, flag=wx.ALIGN_CENTER)
         self.sizer.Layout()
         old_size = self.GetSize()
         needed_size = self.GetBestSize()
@@ -141,3 +154,22 @@ class QuizFrame(wx.Frame):
         result_height = max(old_size.GetHeight(), needed_size.GetHeight())
         result_size = wx.Size(result_width, result_height)
         self.SetSize(result_size)
+
+    def set_state(self, state):
+        self.history.append(state)
+        self.save_history()
+        self.enter_state(state)
+
+    def undo(self, event):
+        if len(self.history) > 1:
+            self.history.pop(-1)
+            self.save_history()
+            self.enter_state(self.history[-1])
+
+    def save_history(self):
+        save(HISTORY_FILENAME, self.history)
+
+    def on_close(self, event):
+        if isinstance(self.state_panel, FinalStatePanel):
+            os.remove(HISTORY_FILENAME)
+        self.Destroy()

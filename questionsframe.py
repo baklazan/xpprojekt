@@ -3,6 +3,7 @@ import strings
 from question import Question
 from functions import load, save
 
+QUESTIONS_FILENAME = 'questions.pickle'
 
 class QuestionsFrame(wx.Frame):
 
@@ -74,8 +75,8 @@ class QuestionsFrame(wx.Frame):
     @staticmethod
     def save_question(q):
         try:
-            data = load()
+            data = load(QUESTIONS_FILENAME)
         except FileNotFoundError:
             data = []
         data.append(q)
-        save(data)
+        save(QUESTIONS_FILENAME, data)

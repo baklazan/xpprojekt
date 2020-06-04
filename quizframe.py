@@ -41,21 +41,24 @@ class AnswerStatePanel(StatePanel):
         super(AnswerStatePanel, self).__init__(state, quiz_frame)
         question = state.questions[state.current_question]
         self.question_label = wx.StaticText(parent=self, label=question.text)
-        self.correct_button = wx.Button(parent=self, label=strings.CORRECT_ANSWER_BUTTON)
-        self.wrong_button = wx.Button(parent=self, label=strings.WRONG_ANSWER_BUTTON)
+        
+        self.buttons = []
+        self.buttons_sizer = wx.BoxSizer(orient=wx.HORIZONTAL)
+        
+        for answer, correct in state.questions[state.current_question].answers:
+            button = wx.Button(parent=self, label=answer)
+            self.buttons.append(button)
+            self.buttons_sizer.Add(button, flag=wx.ALIGN_CENTER)
+            button.Bind(wx.EVT_BUTTON, self.on_button)
 
         self.teams_queue_labels = []
-
-        for team in self.state.teams_queue:
-            self.teams_queue_labels.append(wx.StaticText(parent=self, label=team))
-        self.buttons_sizer = wx.BoxSizer(orient=wx.HORIZONTAL)
-        self.buttons_sizer.Add(self.wrong_button, flag=wx.ALIGN_CENTER)
-        self.buttons_sizer.Add(self.correct_button, flag=wx.ALIGN_CENTER)
-
         self.queue_sizer = wx.BoxSizer(orient=wx.VERTICAL)
-        for label in self.teams_queue_labels:
+        
+        for team in self.state.teams_queue:
+            label = wx.StaticText(parent=self, label=team)
+            self.teams_queue_labels.append(label)
             self.queue_sizer.Add(label, flag=wx.ALIGN_CENTER)
-
+        
         self.main_sizer = wx.BoxSizer(orient=wx.VERTICAL)
         self.main_sizer.Add(self.question_label, flag=wx.ALIGN_CENTER)
         self.main_sizer.Add(self.buttons_sizer, flag=wx.ALIGN_CENTER)
@@ -64,9 +67,6 @@ class AnswerStatePanel(StatePanel):
 
         self.bind_all_descendands(wx.EVT_CHAR_HOOK, self.on_key_down, self)
         self.SetFocus()
-
-        self.correct_button.Bind(wx.EVT_BUTTON, self.on_button)
-        self.wrong_button.Bind(wx.EVT_BUTTON, self.on_button)
 
     def on_button(self, event):
         new_state = self.state.answer()
@@ -87,10 +87,20 @@ class ReviewStatePanel(StatePanel):
         super(ReviewStatePanel, self).__init__(state, quiz_frame)
         question = state.questions[state.current_question]
         self.question_label = wx.StaticText(parent=self, label=question.text)
+        self.correct_label = wx.StaticText(parent=self, label=strings.CORRECT_ANSWERS)
         self.continue_button = wx.Button(parent=self, label=strings.REVIEW_BUTTON)
-
+        
+        self.answer_labels = []
+        for answer, correct in question.answers:
+            if correct:
+                label = wx.StaticText(parent=self, label=answer)
+                self.answer_labels.append(label)
+        
         self.sizer = wx.BoxSizer(orient=wx.VERTICAL)
         self.sizer.Add(self.question_label, flag=wx.ALIGN_CENTER)
+        self.sizer.Add(self.correct_label, flag=wx.ALIGN_CENTER)
+        for label in self.answer_labels:
+            self.sizer.Add(label, flag=wx.ALIGN_CENTER)
         self.sizer.Add(self.continue_button, flag=wx.ALIGN_CENTER)
         self.SetSizer(self.sizer)
 

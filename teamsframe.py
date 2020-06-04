@@ -38,7 +38,7 @@ class TeamsFrame(wx.Frame):
         if answer:
             self.Destroy()
             s = state.StartingState(load(), self.getTeams())
-            frame = quizframe.QuizFrame(s)
+            frame = quizframe.QuizFrame([s])
             frame.Show()
         else:
             wx.MessageBox(warning)

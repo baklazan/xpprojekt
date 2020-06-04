@@ -11,14 +11,26 @@ class TeamsFrame(wx.Frame):
         self.waitingTeamForKey = None
         super(TeamsFrame, self).__init__(parent=None, title=strings.TEAMS_SETTINGS)
         self.panel = wx.Panel(self)
-        self.rows_sizer = wx.BoxSizer(wx.VERTICAL)
+
+        self.first_row_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.add_button = wx.Button(self.panel, label=strings.ADD_TEAM_BUTTON)
         self.add_button.Bind(wx.EVT_BUTTON, lambda x: self.addRow())
         self.add_button.Bind(wx.EVT_CHAR_HOOK, self.on_key_down)
-        self.confirm_button = wx.Button(self.panel, label=strings.CONFIRM_TEAMS_BUTTON, pos=(100, 0))
+        self.first_row_sizer.Add(self.add_button)
+        self.confirm_button = wx.Button(self.panel, label=strings.CONFIRM_TEAMS_BUTTON)
         self.confirm_button.Bind(wx.EVT_BUTTON, self.start)
-        self.rows_sizer.Add(self.add_button)
+        self.first_row_sizer.Add(self.confirm_button)
+
+        self.rows_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.rows_sizer.Add(self.first_row_sizer)
+
+        self.panel.SetSizer(self.rows_sizer, True)
         self.addDefaultRows()
+
+        self.main_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.main_sizer.Add(self.panel)
+        self.SetSizerAndFit(self.main_sizer)
+
         self.SetFocus()
 
     def start(self, event):
@@ -66,7 +78,6 @@ class TeamsFrame(wx.Frame):
     def getCharForTeam(self, team_index):
         team_name_input, team_char_id, team_char = self.teams[team_index]
         busy = wx.BusyInfo(f'{strings.PRESS_KEY_MESSAGE} {team_name_input.GetValue()}\n{strings.PRESS_KEY_INFO}', self)
-        wx.Sleep(2)
         self.waitingTeamForKey = team_index
         self.add_button.SetFocus()
 

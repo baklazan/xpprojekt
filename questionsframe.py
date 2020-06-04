@@ -16,7 +16,9 @@ class QuestionsFrame(wx.Frame):
         self.rows_sizer.Add(self.add_btn)
         self.create_question_inputs()
         self.panel.SetSizerAndFit(self.rows_sizer, True)
-        self.Fit()
+        self.sizer = wx.BoxSizer(wx.VERTICAL)
+        self.sizer.Add(self.panel)
+        self.SetSizerAndFit(self.sizer)
 
     def create_question_inputs(self):
         row = wx.BoxSizer(wx.HORIZONTAL)
@@ -60,6 +62,13 @@ class QuestionsFrame(wx.Frame):
             return
         choice_tuples = list(zip(answers, correct))
         q = Question(question_text, answers=choice_tuples)
+
+        self.fields['question'].SetValue('')
+        for key, value in list(self.fields.items())[1:]:
+            choice, box = value
+            choice.SetValue('')
+            box.SetValue(False)
+
         self.save_question(q)
 
     @staticmethod
